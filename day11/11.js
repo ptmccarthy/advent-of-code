@@ -1,4 +1,10 @@
-var input = 'cqjxjnds';
+var input = 'cqjxjndz';
+
+// add a method to the String prototype to "replace" a character in a string
+// at a given index. Strings are immutable, so actually return a new string.
+String.prototype.replaceAt = function(index, character) {
+    return this.substr(0, index) + character + this.substr(index+character.length);
+};
 
 // test if the string contains two different pairs of matching characters
 var contains2Pairs = function(string) {
@@ -37,8 +43,37 @@ var isValid = function(string) {
           containsAlphaSequence(string));
 }
 
-var incrementPassword = function(input) {
+// alphabetically increment the character at a given index
+// if no index supplied, assume the end of the string.
+// wraps a 'z' back to an 'a' which then increments index-1, etc.
+var incrementCharacter = function(string, index) {
+  if (!index) { index = string.length -1; }
+  var charCode = parseInt(string.charCodeAt(index));
 
+  if (charCode < 122) {
+    charCode++;
+    string = string.replaceAt(index, String.fromCharCode(charCode));
+  } else {
+    string = string.replaceAt(index, 'a');
+    string = incrementCharacter(string, index-1);
+  }
+
+  return string;
 }
 
-console.log(isValid(input));
+// given an initial password, iterate until we find the next valid password
+var findNextValidPassword = function(input) {
+  var password = incrementCharacter(input);
+
+  while (!isValid(password)) {
+    password = incrementCharacter(password);
+  }
+
+  return password;
+};
+
+var part1 = findNextValidPassword(input);
+var part2 = findNextValidPassword(part1);
+
+console.log('Part 1 password: ' + part1);
+console.log('Part 2 password: ' + part2);
